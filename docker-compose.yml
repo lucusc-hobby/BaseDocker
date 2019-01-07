@@ -1,0 +1,95 @@
+version: "3"
+
+services:
+  traefik:
+    image: traefik
+    hostname: traefik
+    container_name: traefik
+    command: --api --docker --docker.domain=${PROJECT_DOMAIN} --logLevel=${TRAEFIK_LOG_LEVEL}
+    networks:
+      - proxy
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8085:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik/traefik.toml:/traefik.toml
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.frontend.rule=Host:traefik.${PROJECT_DOMAIN}"
+      - "traefik.docker.network=traefik-internal"
+      - "traefik.port=8080"
+      - "traefik.docker.network=${COMPOSE_PROJECT_NAME}_proxy"
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus
+    hostname: prometheus
+    container_name: prometheus
+    volumes:
+      - "./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=promethues"
+      - "traefik.frontend.rule=Host:promethues.${PROJECT_DOMAIN}"
+      - "traefik.docker.network=traefik-internal"
+      - "traefik.port=9090"
+      - "traefik.docker.network=${COMPOSE_PROJECT_NAME}_proxy"    
+    restart: unless-stopped
+
+  prom_node_exporter:
+    image: prom/node-exporter
+    hostname: prom-node-exporter
+    container_name: prom-node-exporter
+    restart: unless-stopped
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=false"
+    restart: unless-stopped
+
+  cadvisor:
+    image: google/cadvisor:latest
+    hostname: cadvisor
+    container_name: cadvisor
+    networks:
+      - proxy
+    volumes:
+      - "/var/run:/var/run:rw"
+      - "/sys:/sys:ro"
+      - "/var/lib/docker/:/var/lib/docker:ro"
+    labels:
+      - "traefik.enable=false"
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana
+    hostname: grafana
+    container_name: grafana
+    environment:
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-piechart-panel
+    volumes:
+      - graphana_data:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=grafana"
+      - "traefik.frontend.rule=Host:grafana.${PROJECT_DOMAIN}"
+      - "traefik.docker.network=traefik-internal"
+      - "traefik.port=3000"
+      - "traefik.docker.network=${COMPOSE_PROJECT_NAME}_proxy"
+    restart: unless-stopped
+
+volumes:
+  graphana_data:
+    driver: local
+
+networks:
+  proxy:
+    driver: bridge
