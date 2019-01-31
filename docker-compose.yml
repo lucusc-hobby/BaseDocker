@@ -38,14 +38,13 @@ services:
       - "traefik.frontend.rule=Host:promethues.${PROJECT_DOMAIN}"
       - "traefik.docker.network=traefik-internal"
       - "traefik.port=9090"
-      - "traefik.docker.network=${COMPOSE_PROJECT_NAME}_proxy"    
+      - "traefik.docker.network=${COMPOSE_PROJECT_NAME}_proxy"
     restart: unless-stopped
 
   prom_node_exporter:
     image: prom/node-exporter
     hostname: prom-node-exporter
     container_name: prom-node-exporter
-    restart: unless-stopped
     networks:
       - proxy
     labels:
