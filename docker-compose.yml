@@ -85,8 +85,19 @@ services:
       - "traefik.docker.network=${COMPOSE_PROJECT_NAME}_proxy"
     restart: unless-stopped
 
+  portainer:
+    image: portainer/portainer
+    ports: 
+      - 9090:9000
+    volumes: 
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    restart: unless-stopped
+
 volumes:
   graphana_data:
+    driver: local
+  portainer_data:
     driver: local
 
 networks:
