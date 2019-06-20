@@ -1,5 +1,5 @@
 # BaseDocker
-Base set of containers for docker including Traefik, Grafana and Prometheus
+Base set of containers for docker base monitoring and setup
 
 ## Containers
 * [Traefik](https://traefik.io/) reverse proxy
@@ -7,3 +7,4 @@ Base set of containers for docker including Traefik, Grafana and Prometheus
 * CAdvisor
 * Node-Exporter
 * Grafana
+* Portainer

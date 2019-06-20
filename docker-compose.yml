@@ -87,6 +87,8 @@ services:
 
   portainer:
     image: portainer/portainer
+    hostname: portainer
+    container_name: portainer
     ports: 
       - 9090:9000
     volumes: 
