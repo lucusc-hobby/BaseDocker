@@ -89,11 +89,18 @@ services:
     image: portainer/portainer
     hostname: portainer
     container_name: portainer
-    ports: 
-      - 9090:9000
     volumes: 
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=portainer"
+      - "traefik.frontend.rule=Host:portainer.${PROJECT_DOMAIN}"
+      - "traefik.docker.network=traefik-internal"
+      - "traefik.port=9000"
+      - "traefik.docker.network=${COMPOSE_PROJECT_NAME}_proxy"
     restart: unless-stopped
 
 volumes:
