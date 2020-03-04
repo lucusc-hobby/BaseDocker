@@ -10,10 +10,10 @@ services:
       - '--logLevel=${TRAEFIK_LOG_LEVEL}'
     networks:
       - proxy
+      - monitor-net
     ports:
       - '80:80'
       - '443:443'
-      - '8080:8080'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik/traefik.yml:/traefik.yml:ro
@@ -21,7 +21,6 @@ services:
       - 'traefik.enable=true'
       - 'traefik.http.routers.traefik.rule=Host(`traefik.${PROJECT_DOMAIN}`)'
       - 'traefik.http.services.traefik.loadbalancer.server.port=8080'
-      - 'traefik.docker.network=${COMPOSE_PROJECT_NAME}_proxy'
     restart: unless-stopped
 
   prometheus:
@@ -31,12 +30,11 @@ services:
     volumes:
       - './prometheus/prometheus.yml:/etc/prometheus/prometheus.yml'
     networks:
-      - proxy
+      - monitor-net
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.prometheus.rule=Host(`prometheus.${PROJECT_DOMAIN}`)'
       - 'traefik.http.services.prometheus.loadbalancer.server.port=9090'
-      - 'traefik.docker.network=${COMPOSE_PROJECT_NAME}_proxy'
     restart: unless-stopped
 
   prom_node_exporter:
@@ -44,7 +42,7 @@ services:
     hostname: prom-node-exporter
     container_name: prom-node-exporter
     networks:
-      - proxy
+      - monitor-net
     labels:
       - 'traefik.enable=false'
     restart: unless-stopped
@@ -54,7 +52,7 @@ services:
     hostname: cadvisor
     container_name: cadvisor
     networks:
-      - proxy
+      - monitor-net
     volumes:
       - '/var/run:/var/run:rw'
       - '/sys:/sys:ro'
@@ -73,12 +71,11 @@ services:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning/:/etc/grafana/provisioning/
     networks:
-      - proxy
+      - monitor-net
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.grafana.rule=Host(`grafana.${PROJECT_DOMAIN}`)'
       - 'traefik.http.services.grafana.loadbalancer.server.port=3000'
-      - 'traefik.docker.network=${COMPOSE_PROJECT_NAME}_proxy'
     restart: unless-stopped
 
   portainer:
@@ -89,12 +86,11 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
     networks:
-      - proxy
+      - monitor-net
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.portainer.rule=Host(`portainer.${PROJECT_DOMAIN}`)'
       - 'traefik.http.services.portainer.loadbalancer.server.port=9000'
-      - 'traefik.docker.network=${COMPOSE_PROJECT_NAME}_proxy'
     restart: unless-stopped
 
 volumes:
@@ -105,4 +101,4 @@ volumes:
 
 networks:
   proxy:
-    driver: bridge
+  monitor-net:
