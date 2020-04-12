@@ -6,7 +6,7 @@ services:
     hostname: traefik
     container_name: traefik
     command:
-      - '--docker.domain=${PROJECT_DOMAIN}'
+      - '--docker.domain=${DOMAIN}'
       - '--logLevel=${TRAEFIK_LOG_LEVEL}'
     networks:
       - proxy
@@ -19,7 +19,7 @@ services:
       - ./traefik/traefik.yml:/traefik.yml:ro
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.traefik.rule=Host(`traefik.${PROJECT_DOMAIN}`)'
+      - 'traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)'
       - 'traefik.http.services.traefik.loadbalancer.server.port=8080'
       - 'traefik.docker.network=${COMPOSE_PROJECT_NAME}_proxy'
     restart: unless-stopped
@@ -34,7 +34,7 @@ services:
       - proxy
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.prometheus.rule=Host(`prometheus.${PROJECT_DOMAIN}`)'
+      - 'traefik.http.routers.prometheus.rule=Host(`prometheus.${DOMAIN}`)'
       - 'traefik.http.services.prometheus.loadbalancer.server.port=9090'
       - 'traefik.docker.network=${COMPOSE_PROJECT_NAME}_proxy'
     restart: unless-stopped
@@ -76,7 +76,7 @@ services:
       - proxy
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.grafana.rule=Host(`grafana.${PROJECT_DOMAIN}`)'
+      - 'traefik.http.routers.grafana.rule=Host(`grafana.${DOMAIN}`)'
       - 'traefik.http.services.grafana.loadbalancer.server.port=3000'
       - 'traefik.docker.network=${COMPOSE_PROJECT_NAME}_proxy'
     restart: unless-stopped
@@ -92,7 +92,7 @@ services:
       - proxy
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.portainer.rule=Host(`portainer.${PROJECT_DOMAIN}`)'
+      - 'traefik.http.routers.portainer.rule=Host(`portainer.${DOMAIN}`)'
       - 'traefik.http.services.portainer.loadbalancer.server.port=9000'
       - 'traefik.docker.network=${COMPOSE_PROJECT_NAME}_proxy'
     restart: unless-stopped
