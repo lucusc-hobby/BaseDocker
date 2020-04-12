@@ -9,7 +9,7 @@ services:
       - '--docker.domain=${DOMAIN}'
       - '--logLevel=${TRAEFIK_LOG_LEVEL}'
     networks:
-      - proxy
+      - traefik_proxy
     ports:
       - '80:80'
       - '443:443'
@@ -31,7 +31,7 @@ services:
     volumes:
       - './prometheus/prometheus.yml:/etc/prometheus/prometheus.yml'
     networks:
-      - proxy
+      - traefik_proxy
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.prometheus.rule=Host(`prometheus.${DOMAIN}`)'
@@ -44,7 +44,7 @@ services:
     hostname: prom-node-exporter
     container_name: prom-node-exporter
     networks:
-      - proxy
+      - traefik_proxy
     labels:
       - 'traefik.enable=false'
     restart: unless-stopped
@@ -54,7 +54,7 @@ services:
     hostname: cadvisor
     container_name: cadvisor
     networks:
-      - proxy
+      - traefik_proxy
     volumes:
       - '/var/run:/var/run:rw'
       - '/sys:/sys:ro'
@@ -73,7 +73,7 @@ services:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning/:/etc/grafana/provisioning/
     networks:
-      - proxy
+      - traefik_proxy
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.grafana.rule=Host(`grafana.${DOMAIN}`)'
@@ -89,7 +89,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
     networks:
-      - proxy
+      - traefik_proxy
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.portainer.rule=Host(`portainer.${DOMAIN}`)'
